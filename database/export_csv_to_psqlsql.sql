@@ -1,0 +1,4 @@
+COPY catalogue
+FROM 'E:\PHARMACIE\Triage\uploads\CATALOGUES 120824.csv' 
+DELIMITER ',' 
+CSV HEADER;

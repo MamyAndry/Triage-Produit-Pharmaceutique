@@ -1,0 +1,15 @@
+.row{
+    padding-bottom: 2%;
+}
+.page-input {
+    width: 60px;
+    text-align: center;
+}
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+.pagination .page-item {
+    margin: 0 5px;
+}
