@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
 from psql_connector import PostgreSQLConnection
 import pandas as pd
 import os

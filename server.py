@@ -39,20 +39,28 @@ def upload_file():
 
 @app.route('/search', methods=['GET'])
 def search():
+    libelle = str(request.args.get('libelle', ''))
+    page = int(request.args.get('page', 1))
+    rows_per_page = int(request.args.get('rows_per_page', 20))
+
+    # Calculate the OFFSET for SQL query
+    offset = (page - 1) * rows_per_page
     try:
         #Open connection to database
         pg_connection = PostgreSQLConnection()
         pg_connection.connect()
         
         # SQL query to fetch data with LIMIT and OFFSET
-        query = "SELECT * FROM catalogue LIMIT %d OFFSET %d" % (rows_per_page, offset)
+        query = "SELECT * FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s' LIMIT %d OFFSET %d"
+        query = query % ("%" + libelle + "%", rows_per_page, offset)
+
         
         data = pg_connection.execute_query(query, fetch_results=True)
 
         # SQL query to get the total number of records
-        count_query = "SELECT COUNT(*) FROM catalogue"
+        count_query = "SELECT COUNT(*) FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s'" % ("%" + libelle + "%")
         total_records = pg_connection.execute_query(count_query, fetch_one=True, fetch_results=False)[0]
-
+        print(total_records)
         total_pages = (total_records + rows_per_page - 1) // rows_per_page
         
         # Close the database connection
