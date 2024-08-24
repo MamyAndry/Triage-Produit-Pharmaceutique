@@ -5,17 +5,6 @@ import os
 class ExcelConverterApp:
     def __init__(self):
         pass
-        # self.master = master
-        # self.master.title("Excel to CSV Converter")
-        # self.master.geometry("300x150")
-
-        # self.converted_files = []
-
-        # self.upload_button = tk.Button(master, text="Upload and Convert Excel", command=self.upload_and_convert)
-        # self.upload_button.pack(pady=20)
-
-        # self.view_button = tk.Button(master, text="View Converted Files", command=self.view_list)
-        # self.view_button.pack(pady=20)
 
     def get_columns_to_delete(self, columns, columns_to_keep):
         columns_to_delete = list()
@@ -132,13 +121,6 @@ class ExcelConverterApp:
         csv_file = excel_file.replace('.xlsx', '.csv')
         return csv_file
 
-    def select_excel_file(self):
-        excel_file = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
-        if not excel_file:
-            print(not Excel File)
-            return None
-        return excel_file
-
     def read_excel(self, excel_file):
         try:
             df = pd.read_excel(excel_file)
@@ -169,15 +151,7 @@ class ExcelConverterApp:
             
             return csv_file_path
         except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while converting to CSV: {str(e)}")
             return None
-
-    def view_list(self):
-        if not self.converted_files:
-            messagebox.showinfo("Info", "No files have been converted yet.")
-        else:
-            files_list = "\n".join(self.converted_files)
-            messagebox.showinfo("Converted Files", f"Converted files:\n\n{files_list}")
 
     def insert_into_db(self, filename):
         current_directory = os.getcwd()
