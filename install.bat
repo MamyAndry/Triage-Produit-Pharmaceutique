@@ -1,1 +1,1 @@
-pip install pandas psycopg2 flask flask_cors 
+pip install pandas psycopg2 flask flask_cors openpyxl
