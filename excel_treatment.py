@@ -46,8 +46,7 @@ class ExcelConverterApp:
                 self.insert_into_db(csv_file)
                 if csv_file:
                     self.converted_files.append(csv_file)
-                    messagebox.showinfo("Success", f"File converted successfully: {csv_file}")
-
+                    
     def upload_and_convert(self, file_path):
         df = self.read_excel(file_path)
         if df is not None:
@@ -136,7 +135,7 @@ class ExcelConverterApp:
     def select_excel_file(self):
         excel_file = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")])
         if not excel_file:
-            messagebox.showinfo("Info", "No file selected.")
+            print(not Excel File)
             return None
         return excel_file
 
