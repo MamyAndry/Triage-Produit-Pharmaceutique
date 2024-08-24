@@ -15,7 +15,8 @@
             <div class="col-4">
                 <!-- Button to Open Modal -->
                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#fileModal">
-                    Import excel
+                    Importer fichier excel
+                    <span id="uploadSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
@@ -23,8 +24,8 @@
         <div class="row">
             <!-- Search Bar -->
             <div class="input-group mb-3">
-                <input type="text" id="searchBar" class="form-control" placeholder="Search...">
-                <button class="btn btn-primary" id="searchBtn">Search</button>
+                <input type="text" id="searchBar" class="form-control" placeholder="Recherche...">
+                <button class="btn btn-primary" id="searchBtn">Rechercher</button>
             </div>
         </div>
 
@@ -65,15 +66,15 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="fileModalLabel">Upload File</h5>
+                        <h5 class="modal-title" id="fileModalLabel">Importer fichier</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <input type="file" class="form-control" id="fileInput">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="uploadBtn">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <button type="button" class="btn btn-primary" id="uploadBtn">Importer</button>
                     </div>
                 </div>
             </div>
@@ -99,10 +100,13 @@
             $('#uploadBtn').on('click', function() {
                 var formData = new FormData();
                 var fileInput = $('#fileInput')[0].files[0];
+                var uploadSpinner = $('#uploadSpinner');
 
                 if (fileInput) {
                     formData.append('file', fileInput);
 
+                    uploadSpinner.removeClass('d-none');
+                    $('#fileModal').modal('hide');
                     $.ajax({
                         url: 'http://127.0.0.1:5000/upload', // Replace with your server URL for file upload
                         method: 'POST',
@@ -111,14 +115,14 @@
                         contentType: false,
                         success: function(response) {
                             alert('FICHIER EXCEL IMPORTE AVEC SUCCES');
-                            $('#fileModal').modal('hide');
                         },
                         error: function(xhr, status, error) {
-                            console.error('Upload failed: ', status, error);
-                        }
+                            console.error('IMPORTATION ECHOUE: ', status, error);
+                        },
+                        c
                     });
                 } else {
-                    alert('Please select a file to upload.');
+                    alert('VEUILLEZ SELECTIONNER UN FICHIER A IMPORTER');
                 }
             });
         });
