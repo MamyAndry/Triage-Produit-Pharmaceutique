@@ -108,14 +108,6 @@ class ExcelConverterApp:
         csv_file = excel_file.replace('.xlsx', '.csv')
         return csv_file
 
-    def read_excel(self, excel_file):
-        try:
-            df = pd.read_excel(excel_file)
-            return df
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred while reading the Excel file: {str(e)}")
-            return None
-
     def convert_to_csv(self, df, excel_file):
         try:
             # Specify the output directory
@@ -135,7 +127,7 @@ class ExcelConverterApp:
             
             # Convert to CSV
             df.to_csv(csv_file_path, index=False)	
-			o   s.remove(excel_file)	
+            os.remove(excel_file)	
             os.chmod(csv_file_path, 0o666)
             return csv_file_path
         except Exception as e:
@@ -159,4 +151,4 @@ class ExcelConverterApp:
         print(truncate_query_result)
         print(query_result)
         pg_connection.close()
-	    os.remove(emplacement) 
+        os.remove(emplacement) 
