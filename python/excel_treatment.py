@@ -135,7 +135,7 @@ class ExcelConverterApp:
             
             # Convert to CSV
             df.to_csv(csv_file_path, index=False)
-            
+            os.chmod(csv_file_path, 0o666)
             return csv_file_path
         except Exception as e:
             return None
