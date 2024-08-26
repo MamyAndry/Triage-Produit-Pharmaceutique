@@ -10,6 +10,18 @@
     <title>Triage Produit Pharmaceutique</title> 
 </head>
 <body>
+    <!-- Header Section -->
+    <header class="pharmacy-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="pharmacy-logo">
+                    <a href="#" class="text-decoration-none">Pharmacie ANDIAMANALINA</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    </div>
     <div class="container mt-5">
         <div class="row">
             <div class="col-4">
@@ -35,7 +47,7 @@
         <div class="row">
             <!-- Table -->
             <table class="table table-bordered" id="myTable">
-                <thead class="table-light">
+                <thead class="table-header">
                     <tr>
                         <th>FOURNISSEUR</th>
                         <th>LIBELLE</th>
@@ -84,6 +96,7 @@
         </div>
     </div>
 
+    <script src="assets/js/formatter.js"></script>
     <script>
         let searchTermSaved  = "";
         const rowsPerPage = 20; // Number of rows per page
@@ -104,7 +117,7 @@
                 var formData = new FormData();
                 var fileInput = $('#fileInput')[0].files[0];
                 var uploadSpinner = $('#uploadSpinner');
-                var alert = $('alert')
+                var alert = $('#alert')
                 if (fileInput) {
                     formData.append('file', fileInput);
 
@@ -117,6 +130,7 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
+                            fetchPage(currentPage);
                             uploadSpinner.addClass('d-none');
                             alert.append(`<div class="alert alert-success alert-dismissible" role="alert">
                                 FICHIER EXCEL IMPORTE AVEC SUCCES
@@ -177,6 +191,12 @@
             });
         }
 
+        function formatTVA(value){
+            if(value == "1")
+                return "TVA";
+            return "";
+        }
+
         // Function to update the table with fetched data
         function updateTable(data) {
             $('#myTable tbody').empty(); // Clear the existing table body
@@ -186,9 +206,9 @@
                     <tr>
                         <td>${row[0]}</td>
                         <td>${row[1]}</td>
-                        <td>${row[2]}</td>
-                        <td>${row[3]}</td>
-                        <td>${row[4]}</td>
+                        <td>${currencyFormatter('fr-FR', 'MGA', row[2])}</td>
+                        <td>${formatTVA(row[3])}</td>
+                        <td>${dateFormatter(row[4])}</td>
                     </tr>
                 `);
             });

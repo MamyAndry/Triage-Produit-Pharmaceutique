@@ -13,3 +13,30 @@
 .pagination .page-item {
     margin: 0 5px;
 }
+.pharmacy-header {
+    background-color: #01D758; /* Pharmacy Green */
+    color: white;
+    padding: 1% 2%;
+}
+.pharmacy-header a {
+    color: white;
+}
+.pharmacy-logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+.nav-link {
+    margin-right: 15px;
+}
+td {
+    padding: 10%; /* Add 10 pixels of padding */
+}
+.table-header{
+    background-color: #01D758; /* Pharmacy Green */
+    color: white;
+    padding: 10px 20px;
+}
+.btn-success{
+    background-color: #01D758; /* Pharmacy Green */
+    border-color: #01D758;
+}
