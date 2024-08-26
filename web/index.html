@@ -106,7 +106,7 @@
             $('#searchBtn').on('click', function() {
                 var searchTerm = $('#searchBar').val();
                 searchTermSaved = searchTerm;
-                currentPage = 1;
+                currentPage = 1;    
                 fetchDataSearched(currentPage);
             });
 
@@ -128,7 +128,8 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            fetchPage(currentPage);
+                            alert.empty();
+                            window.location.reload();
                             uploadSpinner.addClass('d-none');
                             alert.append(`<div class="alert alert-success alert-dismissible" role="alert">
                                 FICHIER EXCEL IMPORTE AVEC SUCCES
@@ -157,9 +158,9 @@
                 type: 'GET',
                 data: { page: curr_page, rows_per_page: rowsPerPage },
                 success: function (response) {
+                    totalPages = response.totalPages;
                     updateTable(response.data);
                     setupPagination(response.totalPages, curr_page, "fetchPage"); // Update pagination with new current page
-                    totalPages = response.totalPages;
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching data:", error);
@@ -179,9 +180,9 @@
                 type: 'GET',
                 data: { libelle: searchTermSaved, page: curr_page, rows_per_page: rowsPerPage },
                 success: function (response) {
+                    totalPages = response.totalPages;
                     updateTable(response.data);
                     setupPagination(response.totalPages, curr_page, "fetchDataSearched"); // Update pagination with new current page
-                    totalPages = response.totalPages;
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching data:", error);

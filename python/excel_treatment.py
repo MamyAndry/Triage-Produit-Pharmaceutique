@@ -134,7 +134,8 @@ class ExcelConverterApp:
             csv_file_path = os.path.join(output_dir, csv_filename)
             
             # Convert to CSV
-            df.to_csv(csv_file_path, index=False)
+            df.to_csv(csv_file_path, index=False)	
+			o   s.remove(excel_file)	
             os.chmod(csv_file_path, 0o666)
             return csv_file_path
         except Exception as e:
@@ -158,4 +159,4 @@ class ExcelConverterApp:
         print(truncate_query_result)
         print(query_result)
         pg_connection.close()
- 
+	    os.remove(emplacement) 
