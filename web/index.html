@@ -20,6 +20,9 @@
                 </button>
             </div>
         </div>
+        <div class="row">
+            <div id="alert"></div>
+        </div>
 
         <div class="row">
             <!-- Search Bar -->
@@ -101,7 +104,7 @@
                 var formData = new FormData();
                 var fileInput = $('#fileInput')[0].files[0];
                 var uploadSpinner = $('#uploadSpinner');
-
+                var alert = $('alert')
                 if (fileInput) {
                     formData.append('file', fileInput);
 
@@ -114,7 +117,9 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            alert('FICHIER EXCEL IMPORTE AVEC SUCCES');
+                            alert.append(`<div class="alert alert-success alert-dismissible" role="alert">
+                                FICHIER EXCEL IMPORTE AVEC SUCCES
+                            </div>`);
                         },
                         error: function(xhr, status, error) {
                             console.error('IMPORTATION ECHOUE: ', status, error);
@@ -122,7 +127,9 @@
                         c
                     });
                 } else {
-                    alert('VEUILLEZ SELECTIONNER UN FICHIER A IMPORTER');
+                    alert.append(`<div class="alert alert-warning alert-dismissible" role="alert">
+                        VEUILLEZ SELECTIONNER UN FICHIER A IMPORTER
+                    </div>`);
                 }
             });
         });

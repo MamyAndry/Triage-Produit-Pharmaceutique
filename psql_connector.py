@@ -10,7 +10,7 @@ class PostgreSQLConnection:
         self.port = port
         self.connection = None
         self.cursor = None
-
+ 
     def connect(self):
         """Establishes a connection to the PostgreSQL server."""
         try:

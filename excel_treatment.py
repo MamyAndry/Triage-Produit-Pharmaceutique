@@ -21,21 +21,12 @@ class ExcelConverterApp:
         columns = df.columns.tolist()
         columns_to_delete = self.get_columns_to_delete(columns, column_arrangement)
         treated_df = df.drop(columns=columns_to_delete, inplace=False)
-        treated_df = self.arrange_data_frame_columns(treated_df, column_arrangement) 
+        treated_df = self.arrange_data_frame_columns(treated_df, column_arrangement)
+        # Delete rows where 'column_name' is an empty string
+        treated_df = treated_df[treated_df['LIBELLE'] != '']
+
         return treated_df
-    
-    def upload_and_convert2(self):
-        excel_file = self.select_excel_file()
-        if excel_file:
-            df = self.read_excel(excel_file)
-            if df is not None:
-                df = self.process_dataframe(df)
-                csv_file = self.convert_to_csv(df, excel_file)
-                print(csv_file)
-                self.insert_into_db(csv_file)
-                if csv_file:
-                    self.converted_files.append(csv_file)
-                    
+                   
     def upload_and_convert(self, file_path):
         df = self.read_excel(file_path)
         if df is not None:
