@@ -30,6 +30,7 @@ def upload_file():
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
         file_processor = ExcelConverterApp()
+        print('UPLOAD')
         csv_file = file_processor.upload_and_convert(filename)
         if csv_file:
             return f'File converted successfully: {csv_file}'

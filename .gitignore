@@ -1,0 +1,5 @@
+# Ignore all files in the `temp` directory
+uploads/
+
+# Ignore all .pyc files
+*.pyc

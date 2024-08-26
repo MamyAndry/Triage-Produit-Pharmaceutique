@@ -3,9 +3,6 @@ import pandas as pd
 import os
 
 class ExcelConverterApp:
-    def __init__(self):
-        pass
-
     def get_columns_to_delete(self, columns, columns_to_keep):
         columns_to_delete = list()
         for column in columns:
@@ -22,9 +19,8 @@ class ExcelConverterApp:
         columns_to_delete = self.get_columns_to_delete(columns, column_arrangement)
         treated_df = df.drop(columns=columns_to_delete, inplace=False)
         treated_df = self.arrange_data_frame_columns(treated_df, column_arrangement)
-        # Delete rows where 'column_name' is an empty string
-        treated_df = treated_df[treated_df['LIBELLE'] != '']
-
+        # Drop rows where any NaN values are present
+        treated_df = treated_df.dropna()
         return treated_df
                    
     def upload_and_convert(self, file_path):
