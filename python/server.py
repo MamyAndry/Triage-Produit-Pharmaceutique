@@ -6,6 +6,7 @@ from psql_connector import PostgreSQLConnection
 from io import BytesIO
 from excel_merger import *
 from datetime import datetime
+from utils import *
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for the entire app
@@ -80,7 +81,7 @@ def upload_catalogue_file():
     
     # Add the file name to the response headers
     response.headers["X-Filename"] = file_name + ".xlsx"
-    
+    delete_all_files_in_directory(app.config['UPLOAD_FOLDER'])    
     return response
     
 
