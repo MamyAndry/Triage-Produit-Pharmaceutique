@@ -1,14 +1,17 @@
-from flask import Flask, jsonify, request, redirect, url_for, render_template, send_from_directory
+from flask import Flask, jsonify, request, redirect, render_template, send_file
 from flask_cors import CORS
 from excel_treatment import ExcelConverterApp
 import os
 from psql_connector import PostgreSQLConnection
+from io import BytesIO
+from excel_merger import *
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for the entire app
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['ALLOWED_EXTENSIONS'] = {'xlsx'}
+app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls'}
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -33,10 +36,55 @@ def upload_file():
         print('UPLOAD')
         csv_file = file_processor.upload_and_convert(filename)
         if csv_file:
-            return f'File converted successfully: {csv_file}'
-        return 'File conversion failed'
+            return f'Fichier convertit avec success: {csv_file}'
+        return 'Conversion du fichier échoué'
     return 'Invalid file format'
 
+
+@app.route('/upload-catalogue', methods=['POST'])
+def upload_catalogue_file():
+    if 'files' not in request.files:
+        return jsonify({"error": "Il manque un fichier"}), 400
+    files = request.files.getlist('files')
+    fournisseurs = request.form.getlist('fournisseurs')
+    print(files, " ", fournisseurs)
+    
+    if len(files) != len(fournisseurs):
+        return jsonify({"error": "Le nombre de ficher et de fournisseurs doivent être égaux"}), 400
+
+    file_paths = []
+    for file in files:
+        if file.filename == '':
+            return jsonify({"error": "Aucun fichier sélectionné"}), 400
+        if file and allowed_file(file.filename):
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file.save(file_path)
+            file_paths.append(file_path)
+  # Process and combine the data
+    combined_df = process_excel_files(file_paths, fournisseurs)
+   
+   
+    current_date = datetime.now()
+    # Formater la date (exemple : "YYYY-MM-DD HH:MM:SS")
+    now = current_date.strftime('%d%m%Y')
+    file_name =  "CATALOGUES_" + now + ".xlsx"
+    # Create a BytesIO object to store the Excel file
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        combined_df.to_excel(writer, index=False, sheet_name=file_name)
+    output.seek(0)
+   
+    # Clean up temporary files
+    for file_path in file_paths:
+        os.remove(file_path)
+
+    # Return the Excel file for direct download
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=file_name,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 @app.route('/search', methods=['GET'])
 def search():

@@ -96,6 +96,7 @@
 
     <script src="assets/js/formatter.js"></script>
     <script>
+        const API_BASE_URL = 'http://127.0.0.1:5000';
         let searchTermSaved  = "";
         const rowsPerPage = 20; // Number of rows per page
         let currentPage = 1; // Current page number    
@@ -122,7 +123,7 @@
                     uploadSpinner.removeClass('d-none');
                     $('#fileModal').modal('hide');
                     $.ajax({
-                        url: 'http://127.0.0.1:5000/upload', // Replace with your server URL for file upload
+                        url: `${API_BASE_URL}/upload`, // Replace with your server URL for file upload
                         method: 'POST',
                         data: formData,
                         processData: false,
@@ -154,7 +155,7 @@
 
             // AJAX request to fetch data for the specific page
             $.ajax({
-                url: 'http://127.0.0.1:5000/fetch_data',
+                url: `${API_BASE_URL}/fetch_data`,
                 type: 'GET',
                 data: { page: curr_page, rows_per_page: rowsPerPage },
                 success: function (response) {
@@ -176,7 +177,7 @@
 
             // AJAX request to fetch data for the specific page
             $.ajax({
-                url: 'http://127.0.0.1:5000/search',
+                url: `${API_BASE_URL}/search`,
                 type: 'GET',
                 data: { libelle: searchTermSaved, page: curr_page, rows_per_page: rowsPerPage },
                 success: function (response) {

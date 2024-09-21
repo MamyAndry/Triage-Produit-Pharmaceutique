@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <title>Triage Produit Pharmaceutique</title> 
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="pharmacy-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="pharmacy-logo">
+                    <a href="#" class="text-decoration-none">Pharmacie RABARISOA</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    </div>
+    <div>
+
+    </div>
+    <div class="container mt-5">
+        <div class="row">
+        <form action="" class="row g-3" id="excel_form">
+            <h3 style="color: green;">Catalogue</h3>
+            <button type="button" class="btn btn-success success" id="ajout_cat">Ajouter Catalogue</button>
+            <div class="catalogue">
+                <div id="excel_form_inputs">
+                    <input type="text" class="form-control" name="fournisseur">
+                    <input type="file" class="form-control" id="file_select" name="file">
+                </div>
+            </div>
+            <button style="margin-left: 74%;" type="submit" class="btn btn-success success">Assembler</button>
+            </form>
+        </div>
+        <div class="row">
+            <div id="alert"></div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    const API_BASE_URL = 'http://127.0.0.1:5000';
+
+    $(document).ready(function() {
+    // Clone catalogue div when "Ajouter Catalogue" is clicked
+    $("#ajout_cat").on("click", function() {
+        var newCatalogue = $(".catalogue:first").clone();
+        newCatalogue.find("input").val(""); // Clear input values
+        
+        // Add a remove button to the cloned div
+        // var removeButton = $('<button type="button" class="btn btn-danger remove-catalogue">Supprimer</button>');
+        // newCatalogue.append(removeButton);
+        
+        newCatalogue.insertAfter($(this));
+    });
+    // Handle removal of cloned catalogue div
+    $(document).on("click", ".remove-catalogue", function() {
+        $(this).closest(".catalogue").remove();
+    });
+
+    // Handle form submission
+    $("#excel_form").on("submit", function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData();
+        
+        // Collect all fournisseur inputs and files
+        $(".catalogue").each(function(index) {
+            var fournisseur = $(this).find("input[name='fournisseur']").val();
+            var file = $(this).find("input[type='file']")[0].files[0];
+            
+            if (fournisseur && file) {
+                formData.append('files', file);
+                formData.append('fournisseurs', fournisseur);
+            }
+        });
+
+        console.log(formData);
+        // Send AJAX request
+        $.ajax({
+            url: `${API_BASE_URL}/upload-catalogue`,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhrFields: {
+                responseType: 'blob' // to handle file download
+            },
+            success: function(blob, status, xhr) {
+                // Create a link and trigger download
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "combined_output_with_fournisseur.xlsx";
+                link.click();
+
+                $("#alert").html('<div class="alert alert-success">Files processed successfully. Download started!</div>');
+            },
+            error: function(xhr, status, error) {
+                // Handle error
+                $("#alert").html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+            }
+        });
+    });
+});
+</script>

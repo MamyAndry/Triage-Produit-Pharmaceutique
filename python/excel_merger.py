@@ -129,34 +129,3 @@ def export_combined_data(df, output_file):
     df.to_excel(output_file, index=False)
     print(f"All Excel files combined, filtered, and saved as '{output_file}'.")
 
-# Main execution
-if __name__ == "__main__":
-    # # List of Excel files (adjust path accordingly)
-    # excel_files = glob.glob("E:\\PHARMACIE\\catalogue\\*.xlsx")  # Adjust path accordingly
-    
-    # # Combine all files
-    # combined_df = combine_excel_files(excel_files)
-    
-    # # Export the combined data
-    # export_combined_data(combined_df, "combined_output.xlsx")
-
-    try:
-        file_paths = [
-            "E:\\PHARMACIE\\catalogue\\CATALOGUE UBIPHARM PCIE 20 SEPTEMBRE 2024.xlsx", 
-            "E:\\PHARMACIE\\catalogue\\CatalogueSOPHARMADDU06août2024.xls", 
-            "E:\\PHARMACIE\\catalogue\\DISPONIBLE 20092024.xls"
-        ]
-        fournisseurs = [
-            "UBIPHARM",
-            "SOPHARMAD",
-            "INTERPHARMA SARL"
-        ]
-        
-        # Process and combine the data
-        combined_df = process_excel_files(file_paths, fournisseurs)
-        
-        # Export the combined data to an Excel file
-        export_combined_data(combined_df, "combined_output_with_fournisseur.xlsx")
-    
-    except Exception as e:
-        print(e)

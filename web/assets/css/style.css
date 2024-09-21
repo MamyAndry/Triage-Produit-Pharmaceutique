@@ -15,7 +15,7 @@
     margin: 0 5px;
 }
 .pharmacy-header {
-    background-color: #01D758; /* Pharmacy Green */
+    background-color:green; /* Pharmacy Green */
     color: white;
     padding: 1% 2%;
 }
@@ -33,11 +33,30 @@ td {
     padding: 10%; /* Add 10 pixels of padding */
 }
 .table-header{
-    background-color: #01D758; /* Pharmacy Green */
+    background-color:green; /* Pharmacy Green */
     color: white;
     padding: 10px 20px;
 }
 .btn-success{
-    background-color: #01D758; /* Pharmacy Green */
-    border-color: #01D758;
+    background-color:green; /* Pharmacy Green */
+    border-color:green;
+}
+#excel_form{
+    text-align: center;
+    border: solid 0.5px rgba(0, 0, 0, .5);
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+#excel_form_inputs{
+    width: 100%;
+    display: flex;
+}
+#file_select{
+    margin-left: 2%;
+    width: 50%;
+}
+.success{
+    width: 25%;
+    margin-left: 1%;
 }
