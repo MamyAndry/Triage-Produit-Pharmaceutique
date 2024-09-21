@@ -3,6 +3,12 @@ import pandas as pd
 import os
 
 class ExcelConverterApp:
+    
+    def remove_accents(df, column_name):
+        # Apply unidecode to remove accents from each entry in the specified column
+        df[column_name] = df[column_name].apply(lambda x: unidecode.unidecode(x) if isinstance(x, str) else x)
+        return df
+    
     def get_columns_to_delete(self, columns, columns_to_keep):
         columns_to_delete = list()
         for column in columns:
@@ -84,6 +90,7 @@ class ExcelConverterApp:
         Process the 'LIBELLE' column.
         """
         df['LIBELLE'] = df["LIBELLE"].replace('Ï', 'I', regex=True)
+        df = self.remove_accents(df, "LIBELLE")
         return df
 
     def process_dataframe(self, df):
