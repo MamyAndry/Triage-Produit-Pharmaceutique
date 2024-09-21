@@ -74,10 +74,6 @@ def upload_catalogue_file():
         combined_df.to_excel(writer, index=False, sheet_name=file_name)
     output.seek(0)
    
-    # Clean up temporary files
-    for file_path in file_paths:
-        os.remove(file_path)
-
     # Return the Excel file for direct download
     return send_file(
         output,

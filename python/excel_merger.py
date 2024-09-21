@@ -1,6 +1,5 @@
 import pandas as pd
-import glob
-
+import os
 import pandas as pd
 import glob
 
@@ -87,9 +86,7 @@ def process_excel_file(file_path):
     for sheet_name in relevant_sheets:
         print(sheet_name, " ", xls.sheet_names)
         df = pd.read_excel(xls, sheet_name=sheet_name)
-        print('----------AVANT\n' , df)
         df = identify_and_reset_header(df)
-        print('----------APRES\n' , df)
         df = extract_and_unify_columns(df)
         df = clean_dataframe(df)
         file_data.append(df)
@@ -113,6 +110,7 @@ def process_excel_files(file_paths, fournisseurs):
             df['FOURNISSEUR'] = fournisseur
             
             combined_data.append(df)
+            os.remove(file_path)
     
     return pd.concat(combined_data, ignore_index=True) if combined_data else pd.DataFrame()
 
