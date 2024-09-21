@@ -143,7 +143,6 @@ class ExcelConverterApp:
             DELIMITER ',' 
             CSV HEADER
         '''
-        print(query)
         pg_connection = PostgreSQLConnection()
         pg_connection.connect()
         truncate_query_result = pg_connection.execute_query(truncate_query, fetch_results=False)

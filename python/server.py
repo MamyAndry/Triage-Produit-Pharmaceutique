@@ -33,7 +33,6 @@ def upload_file():
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
         file_processor = ExcelConverterApp()
-        print('UPLOAD')
         csv_file = file_processor.upload_and_convert(filename)
         if csv_file:
             return f'Fichier convertit avec success: {csv_file}'
@@ -46,9 +45,7 @@ def upload_catalogue_file():
     if 'files' not in request.files:
         return jsonify({"error": "Il manque un fichier"}), 400
     files = request.files.getlist('files')
-    fournisseurs = request.form.getlist('fournisseurs')
-    print(files, " ", fournisseurs)
-    
+    fournisseurs = request.form.getlist('fournisseurs')    
     if len(files) != len(fournisseurs):
         return jsonify({"error": "Le nombre de ficher et de fournisseurs doivent être égaux"}), 400
 
@@ -67,20 +64,25 @@ def upload_catalogue_file():
     current_date = datetime.now()
     # Formater la date (exemple : "YYYY-MM-DD HH:MM:SS")
     now = current_date.strftime('%d%m%Y')
-    file_name =  "CATALOGUES_" + now + ".xlsx"
+    file_name =  "CATALOGUES_" + now
     # Create a BytesIO object to store the Excel file
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         combined_df.to_excel(writer, index=False, sheet_name=file_name)
     output.seek(0)
-   
-    # Return the Excel file for direct download
-    return send_file(
+    # Return the Excel file for direct download along with the file name
+    response = send_file(
         output,
         as_attachment=True,
-        download_name=file_name,
+        download_name=file_name + ".xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+    
+    # Add the file name to the response headers
+    response.headers["X-Filename"] = file_name + ".xlsx"
+    
+    return response
+    
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -105,7 +107,6 @@ def search():
         # SQL query to get the total number of records
         count_query = "SELECT COUNT(*) FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s'" % ("%" + libelle + "%")
         total_records = pg_connection.execute_query(count_query, fetch_one=True, fetch_results=False)[0]
-        print(total_records)
         total_pages = (total_records + rows_per_page - 1) // rows_per_page
         
         # Close the database connection

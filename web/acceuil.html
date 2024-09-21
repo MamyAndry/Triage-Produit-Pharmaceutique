@@ -51,6 +51,7 @@
     </div>
 </body>
 </html>
+<script src="assets/js/formatter.js"></script>
 <script>
     const API_BASE_URL = 'http://127.0.0.1:5000';
 
@@ -100,12 +101,28 @@
                 responseType: 'blob' // to handle file download
             },
             success: function(blob, status, xhr) {
+                var filename = "";
+                var disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    var matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
+
+                // If filename is not found in Content-Disposition, use X-Filename
+                if (!filename) {
+                    const currentDate = new Date();
+                    filename = xhr.getResponseHeader('X-Filename') || "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
+                }
                 // Create a link and trigger download
                 var link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = "combined_output_with_fournisseur.xlsx";
+                link.download = filename;
+                document.body.appendChild(link);
                 link.click();
-
+                document.body.removeChild(link);
                 $("#alert").html('<div class="alert alert-success">Files processed successfully. Download started!</div>');
             },
             error: function(xhr, status, error) {

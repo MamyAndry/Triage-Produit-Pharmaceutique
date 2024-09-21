@@ -25,16 +25,6 @@ def check_if_column_contains_words(col, list):
             return True
     return False
 
-# Function to extract the relevant columns (libelle/designation, Prix/PU, Date peremption)
-def extract_relevant_columns(df):
-    columns_to_extract = [
-        next(col for col in df.columns if check_if_column_contains_words(col, ['libelle', 'libell2', 'designation', 'désignation', 'denomination', 'dénomination']) is True),
-        next(col for col in df.columns if check_if_column_contains_words(col, ['prix', 'pu', 'p.u']) is True),
-        next(col for col in df.columns if check_if_column_contains_words(col, ['date', 'peremption', 'per', 'dp']) is True),
-        next(col for col in df.columns if check_if_column_contains_words(col, ['tva', 'taxe', 'obs']) is True)
-    ]
-    return df[columns_to_extract]
-
 # Function to extract and unify relevant columns (libelle/designation, Prix/PU, Date peremption)
 def extract_and_unify_columns(df):    
     # Convert column names to lowercase for easier matching
@@ -84,7 +74,6 @@ def process_excel_file(file_path):
     relevant_sheets = filter_sheets_by_name(xls.sheet_names)
     
     for sheet_name in relevant_sheets:
-        print(sheet_name, " ", xls.sheet_names)
         df = pd.read_excel(xls, sheet_name=sheet_name)
         df = identify_and_reset_header(df)
         df = extract_and_unify_columns(df)
@@ -110,7 +99,6 @@ def process_excel_files(file_paths, fournisseurs):
             df['FOURNISSEUR'] = fournisseur
             
             combined_data.append(df)
-            os.remove(file_path)
     
     return pd.concat(combined_data, ignore_index=True) if combined_data else pd.DataFrame()
 
