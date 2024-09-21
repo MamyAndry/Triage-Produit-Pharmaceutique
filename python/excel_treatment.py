@@ -1,13 +1,21 @@
 from psql_connector import PostgreSQLConnection
 import pandas as pd
 import os
+import unidecode
 
 class ExcelConverterApp:
-    
-    def remove_accents(df, column_name):
-        # Apply unidecode to remove accents from each entry in the specified column
-        df[column_name] = df[column_name].apply(lambda x: unidecode.unidecode(x) if isinstance(x, str) else x)
-        return df
+
+    def standardize_string(self, s):
+        # Remove accents and convert to UTF-8 supported characters
+        try:
+            return unidecode.unidecode(s).encode('utf-8', 'ignore').decode('utf-8')
+        except Exception as e:
+            return None  # or handle in a specific way if needed
+    def standardize_column(self, df, column_name):
+        
+        # Apply standardization to the specified column
+        df[column_name] = df[column_name].apply(lambda x: self.standardize_string(x) if isinstance(x, str) else x)
+        return df    
     
     def get_columns_to_delete(self, columns, columns_to_keep):
         columns_to_delete = list()
@@ -90,7 +98,7 @@ class ExcelConverterApp:
         Process the 'LIBELLE' column.
         """
         df['LIBELLE'] = df["LIBELLE"].replace('Ï', 'I', regex=True)
-        df = self.remove_accents(df, "LIBELLE")
+        df = self.standardize_column(df, "LIBELLE")
         return df
 
     def process_dataframe(self, df):
