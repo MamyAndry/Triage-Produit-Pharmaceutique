@@ -25,6 +25,7 @@ class PostgreSQLConnection:
             print("Connection to PostgreSQL established successfully.")
         except Exception as error:
             print("Error while connecting to PostgreSQL:", error)
+    
     def execute_query(self, query, fetch_one=False, fetch_results=True):
         """
         Executes a given SQL query. Can handle fetching and modifying queries.

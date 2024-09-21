@@ -86,7 +86,7 @@ def upload_catalogue_file():
 
 @app.route('/search', methods=['GET'])
 def search():
-    libelle = str(request.args.get('libelle', ''))
+    libelle = str(request.args.get('libelle', '')).upper()
     page = int(request.args.get('page', 1))
     rows_per_page = int(request.args.get('rows_per_page', 20))
 

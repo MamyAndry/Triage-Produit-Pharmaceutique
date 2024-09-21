@@ -11,12 +11,18 @@ class ExcelConverterApp:
             return unidecode.unidecode(s).encode('utf-8', 'ignore').decode('utf-8')
         except Exception as e:
             return None  # or handle in a specific way if needed
+        
     def standardize_column(self, df, column_name):
         
         # Apply standardization to the specified column
         df[column_name] = df[column_name].apply(lambda x: self.standardize_string(x) if isinstance(x, str) else x)
         return df    
     
+    def to_uppercase(self, df, column_name):
+        # Apply str.upper() to convert all strings in the specified column to uppercase
+        df[column_name] = df[column_name].apply(lambda x: x.upper() if isinstance(x, str) else x)
+        return df
+
     def get_columns_to_delete(self, columns, columns_to_keep):
         columns_to_delete = list()
         for column in columns:
@@ -99,6 +105,7 @@ class ExcelConverterApp:
         """
         df['LIBELLE'] = df["LIBELLE"].replace('Ï', 'I', regex=True)
         df = self.standardize_column(df, "LIBELLE")
+        df = self.to_uppercase(df, "LIBELLE")
         return df
 
     def process_dataframe(self, df):
