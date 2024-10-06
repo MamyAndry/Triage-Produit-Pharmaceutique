@@ -1,0 +1,1 @@
+CREATE TRIGGER t_insert_search

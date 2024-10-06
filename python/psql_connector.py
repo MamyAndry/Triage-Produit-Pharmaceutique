@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2 import sql
 
 class PostgreSQLConnection:
-    def __init__(self, host="localhost", database="pharmacie", user="mamisoa", password="prom15", port="5432"):
+    def __init__(self, host="localhost", database="pharmacie", user="postgres", password="postgres", port="5432"):
         self.host = host
         self.database = database
         self.user = user

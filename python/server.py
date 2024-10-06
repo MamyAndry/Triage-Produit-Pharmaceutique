@@ -14,6 +14,10 @@ CORS(app)  # Enable CORS for the entire app
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls'}
 
+
+pg_connection = PostgreSQLConnection()
+pg_connection.connect()
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
@@ -87,31 +91,28 @@ def upload_catalogue_file():
 
 @app.route('/search', methods=['GET'])
 def search():
-    libelle = str(request.args.get('libelle', '')).upper()
+    searched_words = str(request.args.get('libelle', ''))
+    if searched_words != '':
+        searched_words = searched_words.strip() 
+    libelle = searched_words.upper()
     page = int(request.args.get('page', 1))
     rows_per_page = int(request.args.get('rows_per_page', 20))
 
     # Calculate the OFFSET for SQL query
     offset = (page - 1) * rows_per_page
     try:
-        #Open connection to database
-        pg_connection = PostgreSQLConnection()
-        pg_connection.connect()
-        
         # SQL query to fetch data with LIMIT and OFFSET
-        query = "SELECT * FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s' LIMIT %d OFFSET %d"
-        query = query % ("%" + libelle + "%", rows_per_page, offset)
-
+        query = "SELECT fournisseur, libelle, PU, TVA, date_peremption FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s' LIMIT %d OFFSET %d"
+        query = query % ("%" +  libelle.replace(' ', '%%') + "%",  rows_per_page, offset)
+        print(query)
         
         data = pg_connection.execute_query(query, fetch_results=True)
 
         # SQL query to get the total number of records
-        count_query = "SELECT COUNT(*) FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s'" % ("%" + libelle + "%")
+        count_query = "SELECT COUNT(*) FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s'" % ("%" + libelle.replace(' ', '%%') + "%")
         total_records = pg_connection.execute_query(count_query, fetch_one=True, fetch_results=False)[0]
         total_pages = (total_records + rows_per_page - 1) // rows_per_page
         
-        # Close the database connection
-        pg_connection.close()
         # Return the paginated data as a JSON response
         return jsonify({
             'data': data,
@@ -122,6 +123,21 @@ def search():
         print("Error fetching data:", e)
         return jsonify({'error': 'An error occurred while fetching data.'}), 500
 
+@app.route('/furbisher', methods=['GET'])
+def furbisher():
+    try:
+        # SQL query to fetch data with LIMIT and OFFSET
+        query = "SELECT nom FROM fournisseur"        
+        data = pg_connection.execute_query(query, fetch_results=True)
+
+        # Return the paginated data as a JSON response
+        return jsonify({
+            'data': data
+        })
+    except Exception as e:
+        print("Error fetching data:", e)
+        return jsonify({'error': 'An error occurred while fetching data.'}), 500
+    
 @app.route('/fetch_data', methods=['GET'])
 def fetch_data():
     # Get pagination parameters from the request
@@ -131,11 +147,7 @@ def fetch_data():
     offset = (page - 1) * rows_per_page
     
     # Slice the data for the current page
-    try:
-        #Open connection to database
-        pg_connection = PostgreSQLConnection()
-        pg_connection.connect() 
-        
+    try: 
         # SQL query to fetch data with LIMIT and OFFSET
         query = "SELECT * FROM catalogue LIMIT %s OFFSET %s" % (rows_per_page, offset)
         data = pg_connection.execute_query(query, fetch_results=True)
@@ -147,8 +159,6 @@ def fetch_data():
 
         total_pages = (total_records + rows_per_page - 1) // rows_per_page
         
-        # Close the database connection
-        pg_connection.close()
         # Return the paginated data as a JSON response
         return jsonify({
             'data': data,
@@ -163,4 +173,4 @@ def fetch_data():
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

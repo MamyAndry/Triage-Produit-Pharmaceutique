@@ -43,12 +43,12 @@ class ExcelConverterApp:
         treated_df = treated_df.dropna()
         return treated_df
                    
-    def upload_and_convert(self, file_path):
+    def upload_and_convert(self, file_path, connection):
         df = self.read_excel(file_path)
         if df is not None:
             df = self.process_dataframe(df)
             csv_file = self.convert_to_csv(df, file_path)
-            self.insert_into_db(csv_file)
+            self.insert_into_db(csv_file, connection)
         return None 
 
 
@@ -104,6 +104,7 @@ class ExcelConverterApp:
         Process the 'LIBELLE' column.
         """
         df['LIBELLE'] = df["LIBELLE"].replace('Ï', 'I', regex=True)
+        df['LIBELLE'] = df['LIBELLE'].str.strip()
         df = self.standardize_column(df, "LIBELLE")
         df = self.to_uppercase(df, "LIBELLE")
         return df
@@ -155,7 +156,7 @@ class ExcelConverterApp:
         except Exception as e:
             return None
 
-    def insert_into_db(self, filename):
+    def insert_into_db(self, filename, pg_connection):
         current_directory = os.getcwd()
         emplacement = os.path.join(current_directory, filename)
         truncate_query = "TRUNCATE catalogue"
@@ -165,11 +166,13 @@ class ExcelConverterApp:
             DELIMITER ',' 
             CSV HEADER
         '''
-        pg_connection = PostgreSQLConnection()
-        pg_connection.connect()
+        update_query = '''
+            EXECUTE p_entree_fournisseur()
+        '''
         truncate_query_result = pg_connection.execute_query(truncate_query, fetch_results=False)
         query_result = pg_connection.execute_query(query, fetch_results=False)
+        update_query_result = pg_connection.execute_query(update_query, fetch_results=False)
         print(truncate_query_result)
         print(query_result)
-        pg_connection.close()
+        print(update_query_result)
         os.remove(emplacement) 

@@ -19,3 +19,6 @@ def delete_all_files_in_directory(directory_path):
     else:
         print(f"Directory {directory_path} does not exist")
 
+# def search_query(search_term):
+#     search_terms = search_term.split()
+#     for elt in search_terms:
