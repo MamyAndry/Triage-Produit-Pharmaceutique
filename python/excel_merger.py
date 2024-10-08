@@ -9,15 +9,15 @@ def identify_and_reset_header(df):
     if any("Unnamed" in str(col) for col in df.columns):
         # Iterate over rows to find the valid header row
         for idx, row in df.iterrows():
-            if row.notnull().sum() > 2:  # Assume a valid header has more than 2 non-null values
+            if row.notnull().sum() > 3:  # Assume a valid header has more than 2 non-null values
                 df.columns = df.iloc[idx]  # Reset the header to this row
                 df = df.drop(index=list(range(idx + 1)))  # Drop rows before the actual data
                 break
+    print("-------------------DF AVANT-------------------------\n", df)
     return df
 
 def filter_sheets_by_name(sheet_names):
-    # Filter only sheets containing "list" or "produit"
-    return [sheet for sheet in sheet_names if 'list' in sheet.lower() or 'produit' in sheet.lower() or 'dispo' in sheet.lower()]
+    return [sheet for sheet in sheet_names if 'list' in sheet.lower() or 'produit' in sheet.lower() or 'dispo' in sheet.lower() or 'catalogue'  in sheet.lower()]
 
 def check_if_column_contains_words(col, list):
     for word in list:
@@ -45,6 +45,7 @@ def extract_and_unify_columns(df):
         'p.u': 'PU',
         'date': 'DP',
         'peremption': 'DP',
+        'péremption': 'DP',
         'dp': 'DP',
         'tva': 'TVA',
         'obs': 'TVA',
@@ -56,9 +57,12 @@ def extract_and_unify_columns(df):
     unified_df = pd.DataFrame(columns=['LIBELLE', 'PU', 'TVA', 'DP'])
     
     # Extract and map the relevant columns
+    print(df.columns)
     for original_col, unified_col in column_mapping.items():
-        if original_col in df.columns:
-            unified_df[unified_col] = df[original_col]
+        # Check if any of the columns contains the original_col as a substring
+        matching_columns = [col for col in df.columns if original_col in str(col)]
+        if matching_columns:
+            unified_df[unified_col] = df[matching_columns[0]]  # Taking the first match
     
     # Return the unified DataFrame with extracted data
     return unified_df
@@ -79,7 +83,6 @@ def process_excel_file(file_path):
         df = extract_and_unify_columns(df)
         df = clean_dataframe(df)
         file_data.append(df)
-    df['DP'] = df['DP'].replace("'00:00:00", '')
     return pd.concat(file_data, ignore_index=True)
 
 def process_excel_files(file_paths, fournisseurs):
@@ -88,15 +91,17 @@ def process_excel_files(file_paths, fournisseurs):
     for file_path, fournisseur in zip(file_paths, fournisseurs):
         xls = pd.ExcelFile(file_path)
         relevant_sheets = filter_sheets_by_name(xls.sheet_names)
-        
+    
+        print("FILE : ", xls.sheet_names, " FILE PATH : ", file_path)
         for sheet_name in relevant_sheets:
             df = pd.read_excel(xls, sheet_name=sheet_name)
             df = identify_and_reset_header(df)
             df = extract_and_unify_columns(df)
             df = clean_dataframe(df)
-                
+            print("SHEET NAME : ", sheet_name)
             # Add fournisseur column
             df['FOURNISSEUR'] = fournisseur
+            print("------------DF APRES------------------\n", df)
             
             combined_data.append(df)
     

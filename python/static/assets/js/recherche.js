@@ -38,6 +38,7 @@
                     </div>`);
                 },
                 error: function(xhr, status, error) {
+                    uploadSpinner.addClass('d-none');
                     console.error('IMPORTATION ECHOUE: ', status, error);
                 },
             });

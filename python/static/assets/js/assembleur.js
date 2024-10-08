@@ -94,6 +94,7 @@
         });
 
         console.log(formData);
+        uploadSpinner.removeClass('d-none');
         // Send AJAX request
         $.ajax({
             url: `${API_BASE_URL}/upload-catalogue`,
@@ -104,6 +105,7 @@
             xhrFields: {
                 responseType: 'blob' // to handle file download
             },
+            
             success: function(blob, status, xhr) {
                 var filename = "";
                 var disposition = xhr.getResponseHeader('Content-Disposition');
@@ -120,6 +122,7 @@
                     const currentDate = new Date();
                     filename = xhr.getResponseHeader('X-Filename') || "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
                 }
+                uploadSpinner.addClass('d-none');
                 // Create a link and trigger download
                 var link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
@@ -127,9 +130,10 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                $("#alert").html('<div class="alert alert-success">Files processed successfully. Download started!</div>');
+                $("#alert").html('<div class="alert alert-success">Fichier assemblé avec succèss. Téléchargement en cours!</div>');
             },
             error: function(xhr, status, error) {
+                uploadSpinner.addClass('d-none');
                 // Handle error
                 $("#alert").html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
             }
