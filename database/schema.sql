@@ -11,11 +11,13 @@ CREATE TABLE catalogue(
     date_peremption DATE
 );
 
-ALTER TABLE catalogue ADD catalogue_search tsvector NULL;
 CREATE TABLE fournisseur(
     id SERIAL,
     nom VARCHAR(50),
     UNIQUE(nom)
 );
+
+ALTER TABLE catalogue ADD catalogue_search tsvector NULL;
+
 
 SELECT * FROM catalogue WHERE catalogue_search @@ to_tsquery('french', 'paracetamol&500MG&SOPHARMAD&2025'); 

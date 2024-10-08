@@ -167,7 +167,7 @@ class ExcelConverterApp:
             CSV HEADER
         '''
         update_query = '''
-            EXECUTE p_entree_fournisseur()
+            CALL p_entree_fournisseur()
         '''
         truncate_query_result = pg_connection.execute_query(truncate_query, fetch_results=False)
         query_result = pg_connection.execute_query(query, fetch_results=False)

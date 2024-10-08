@@ -79,7 +79,7 @@ def process_excel_file(file_path):
         df = extract_and_unify_columns(df)
         df = clean_dataframe(df)
         file_data.append(df)
-    
+    df['DP'] = df['DP'].replace("'00:00:00", '')
     return pd.concat(file_data, ignore_index=True)
 
 def process_excel_files(file_paths, fournisseurs):

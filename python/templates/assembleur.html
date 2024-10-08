@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+    {% block content%}
+    <div class="container mt-5">
+        <div class="row">
+        <form action="#" class="row g-3" id="excel_form">
+            <h3 style="color: green;">Catalogue</h3>
+            <button type="button" class="btn btn-success success" id="ajout_cat">Ajouter Catalogue</button>
+            <div class="catalogue">
+                <div class="excel_form_inputs">  
+                    <select type="text" class="form-control" id="fournisseur" name="fournisseur">
+                    </select>
+                    <input type="file" class="form-control" id="file_select" name="file">
+                </div>
+            </div>
+            <button style="margin-left: 74%;" type="submit" class="btn btn-success success">Assembler</button>
+            </form>
+        </div>
+        <div class="row">
+            <div id="alert"></div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block script %}
+        <script src="{{ url_for('static', filename='assets/js/formatter.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/jquery-editable-select.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/assembleur.js') }}"></script>
+        <script>
+            $(document).ready(function() {
+                initFurbisherName();
+            });
+        </script>
+    {% endblock %}
