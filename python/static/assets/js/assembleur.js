@@ -33,13 +33,10 @@
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    // Resolve the promise with the data
-                    console.log(response.data)
                     resolve(response.data);
                 },
                 error: function(xhr, status, error) {
-                    // Reject the promise in case of error
-                    reject('Error fetching furbisher: ' + error);
+                    reject('Erreur lors de la collecte des fournisseurs: ' + error);
                 }
             });
         });
@@ -47,7 +44,7 @@
     // Clone catalogue div when "Ajouter Catalogue" is clicked
     $("#ajout_cat").on("click", function() {
         // Add a remove button to the cloned div
-        var newCatalogue = $(`
+        let newCatalogue = $(`
         <div class="catalogue">
             <div class="excel_form_inputs">  
                 <select type="text" class="form-control" id="fournisseur" name="fournisseur">
@@ -80,12 +77,12 @@
     $("#excel_form").on("submit", function(e) {
         e.preventDefault();
         
-        var formData = new FormData();
-        
+        let formData = new FormData();
+        let uploadSpinner = $('#uploadSpinner');
         // Collect all fournisseur inputs and files
         $(".catalogue").each(function(index) {
-            var fournisseur = $(this).find("input[name='fournisseur']").val();
-            var file = $(this).find("input[type='file']")[0].files[0];
+            let fournisseur = $(this).find("input[name='fournisseur']").val();
+            let file = $(this).find("input[type='file']")[0].files[0];
             
             if (fournisseur && file) {
                 formData.append('files', file);
@@ -93,9 +90,54 @@
             }
         });
 
-        console.log(formData);
+        // console.log(formData);
         uploadSpinner.removeClass('d-none');
         // Send AJAX request
+        // $.ajax({
+        //     url: `${API_BASE_URL}/upload-catalogue`,
+        //     type: 'POST',
+        //     data: formData,
+        //     processData: false,
+        //     contentType: false,
+        //     xhrFields: {
+        //         responseType: 'blob' // to handle file download
+        //     },
+            
+        //     success: function(blob, status, xhr) {
+        //         let filename = "";
+        //         let disposition = xhr.getResponseHeader('Content-Disposition');
+        //         if (disposition && disposition.indexOf('attachment') !== -1) {
+        //             let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        //             let matches = filenameRegex.exec(disposition);
+        //             if (matches != null && matches[1]) {
+        //                 filename = matches[1].replace(/['"]/g, '');
+        //             }
+        //         }
+
+        //         // If filename is not found in Content-Disposition, use X-Filename
+        //         if (!filename) {
+        //             const currentDate = new Date();
+        //             filename = xhr.getResponseHeader('X-Filename') || "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
+        //         }
+        //         uploadSpinner.addClass('d-none');
+        //         // Create a link and trigger download
+        //         let link = document.createElement('a');
+        //         link.href = window.URL.createObjectURL(blob);
+        //         link.download = filename;
+        //         document.body.appendChild(link);
+        //         link.click();
+        //         document.body.removeChild(link);
+        //         $("#alert").html('<div class="alert alert-success">Fichier assemblé avec succèss. Téléchargement en cours!</div>');
+        //     },
+        //     error: function(xhr, status, error) {
+        //         uploadSpinner.addClass('d-none');
+        //         // Handle error
+        //         console.log(status);
+        //         console.log(error);
+        //         console.log(xhr);
+        //         handleErrorResponse(xhr.responseText); // Pass the response text to handleErrorResponse
+        //     }
+        // });
         $.ajax({
             url: `${API_BASE_URL}/upload-catalogue`,
             type: 'POST',
@@ -105,37 +147,45 @@
             xhrFields: {
                 responseType: 'blob' // to handle file download
             },
-            
-            success: function(blob, status, xhr) {
-                var filename = "";
-                var disposition = xhr.getResponseHeader('Content-Disposition');
+            success: function(blob, xhr) {
+                // Check if the response is a valid blob (indicating a file)
+                let filename = "";
+                let disposition = xhr.getResponseHeader('Content-Disposition');
                 if (disposition && disposition.indexOf('attachment') !== -1) {
-                    var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                    var matches = filenameRegex.exec(disposition);
+                    let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    let matches = filenameRegex.exec(disposition);
                     if (matches != null && matches[1]) {
                         filename = matches[1].replace(/['"]/g, '');
                     }
                 }
-
+    
                 // If filename is not found in Content-Disposition, use X-Filename
                 if (!filename) {
                     const currentDate = new Date();
                     filename = xhr.getResponseHeader('X-Filename') || "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
                 }
+                
+                console.log("erroR " + response.error);
+    
                 uploadSpinner.addClass('d-none');
-                // Create a link and trigger download
-                var link = document.createElement('a');
+                let link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
                 link.download = filename;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                $("#alert").html('<div class="alert alert-success">Fichier assemblé avec succèss. Téléchargement en cours!</div>');
+                $("#alert").html('<div class="alert alert-success">Fichier assemblé avec succès. Téléchargement en cours!</div>');
+                
             },
-            error: function(xhr, status, error) {
+            error: function(xhr) {
                 uploadSpinner.addClass('d-none');
-                // Handle error
-                $("#alert").html('<div class="alert alert-danger">Error: ' + xhr.responseText + '</div>');
+                console.log(xhr);
+                console.log(xhr.getAllResponseHeaders());
+                handleErrorResponse(xhr.getResponseHeader("X-Error"));
             }
+            
         });
     });
+    function handleErrorResponse(response) {
+            $("#alert").html('<div class="alert alert-danger">Erreurr: ' + response + '</div>');
+    }   

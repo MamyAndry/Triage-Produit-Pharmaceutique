@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, redirect, render_template, send_file
+from flask import Flask, jsonify, request, redirect, render_template, send_file, make_response
 from flask_cors import CORS
 from excel_treatment import ExcelConverterApp
 import os
@@ -58,19 +58,36 @@ def upload_catalogue_file():
     files = request.files.getlist('files')
     fournisseurs = request.form.getlist('fournisseurs')    
     if len(files) != len(fournisseurs):
-        return jsonify({"error": "Le nombre de ficher et de fournisseurs doivent être égaux"}), 400
+        error_message = "Le nombre de ficher et de fournisseurs doivent être égaux"
+        # Return a JSON blob response with the error
+        response = make_response(jsonify({"error": error_message}), 400)
+        response.headers['X-Error'] = error_message  # Include error in headers
+        response.headers["Access-Control-Expose-Headers"] = "X-Error"
+        return response
 
     file_paths = []
     for file in files:
         if file.filename == '':
-            return jsonify({"error": "Aucun fichier sélectionné"}), 400
+            error_message = "Aucun fichier sélectionné"
+            # Return a JSON blob response with the error
+            response = make_response(jsonify({"error": error_message}), 400)
+            response.headers['X-Error'] = error_message  # Include error in headers
+            response.headers["Access-Control-Expose-Headers"] = "X-Error"
+            return response
         if file and allowed_file(file.filename):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
             file_paths.append(file_path)
   # Process and combine the data
-    combined_df = process_excel_files(file_paths, fournisseurs)
-   
+    try:
+        combined_df = process_excel_files(file_paths, fournisseurs)
+    except Exception as e:
+        error_message = str(e)
+        # Return a JSON blob response with the error
+        response = make_response(jsonify({"error": error_message}), 400)
+        response.headers['X-Error'] = error_message  # Include error in headers
+        response.headers["Access-Control-Expose-Headers"] = "X-Error"
+        return response
    
     current_date = datetime.now()
     # Formater la date (exemple : "YYYY-MM-DD HH:MM:SS")
@@ -91,6 +108,7 @@ def upload_catalogue_file():
     
     # Add the file name to the response headers
     response.headers["X-Filename"] = file_name + ".xlsx"
+    
     delete_all_files_in_directory(app.config['UPLOAD_FOLDER'])    
     return response
     

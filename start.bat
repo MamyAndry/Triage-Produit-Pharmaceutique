@@ -1,3 +1,3 @@
 cls
 start iexplore "%cd%\web\index.html"
-python python/server.py
+python python/  server.py

@@ -13,10 +13,11 @@ def identify_and_reset_header(df):
                 df.columns = df.iloc[idx]  # Reset the header to this row
                 df = df.drop(index=list(range(idx + 1)))  # Drop rows before the actual data
                 break
-    print("-------------------DF AVANT-------------------------\n", df)
     return df
 
 def filter_sheets_by_name(sheet_names):
+    if len(sheet_names) == 1:
+        return sheet_names
     return [sheet for sheet in sheet_names if 'list' in sheet.lower() or 'produit' in sheet.lower() or 'dispo' in sheet.lower() or 'catalogue'  in sheet.lower()]
 
 def check_if_column_contains_words(col, list):
@@ -57,13 +58,11 @@ def extract_and_unify_columns(df):
     unified_df = pd.DataFrame(columns=['LIBELLE', 'PU', 'TVA', 'DP'])
     
     # Extract and map the relevant columns
-    print(df.columns)
     for original_col, unified_col in column_mapping.items():
         # Check if any of the columns contains the original_col as a substring
         matching_columns = [col for col in df.columns if original_col in str(col)]
         if matching_columns:
             unified_df[unified_col] = df[matching_columns[0]]  # Taking the first match
-    
     # Return the unified DataFrame with extracted data
     return unified_df
 
@@ -91,18 +90,17 @@ def process_excel_files(file_paths, fournisseurs):
     for file_path, fournisseur in zip(file_paths, fournisseurs):
         xls = pd.ExcelFile(file_path)
         relevant_sheets = filter_sheets_by_name(xls.sheet_names)
-    
-        print("FILE : ", xls.sheet_names, " FILE PATH : ", file_path)
         for sheet_name in relevant_sheets:
+
             df = pd.read_excel(xls, sheet_name=sheet_name)
             df = identify_and_reset_header(df)
             df = extract_and_unify_columns(df)
             df = clean_dataframe(df)
-            print("SHEET NAME : ", sheet_name)
+            if df.empty:
+                raise ValueError(f"Lors de la combinaison des excels, une erreur est survenue sur l'excel du fournisseur: {fournisseur}")
             # Add fournisseur column
             df['FOURNISSEUR'] = fournisseur
-            print("------------DF APRES------------------\n", df)
-            
+                
             combined_data.append(df)
     
     return pd.concat(combined_data, ignore_index=True) if combined_data else pd.DataFrame()
