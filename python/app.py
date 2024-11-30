@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, redirect, render_template, send_file,
 from flask_cors import CORS
 from excel_treatment import ExcelConverterApp
 import os
-from psql_connector import PostgreSQLConnection
+from psql_connector import PostgreSQLDao
 from io import BytesIO
 from excel_merger import *
 from datetime import datetime
@@ -15,7 +15,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls'}
 
 
-pg_connection = PostgreSQLConnection()
+pg_connection = PostgreSQLDao()
 pg_connection.connect()
 
 error_fetching_data = 'Une erreur est survenue lors de la collecte des données.'

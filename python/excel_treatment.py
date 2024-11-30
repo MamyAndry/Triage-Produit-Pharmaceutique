@@ -1,4 +1,5 @@
-from psql_connector import PostgreSQLConnection
+from psql_connector import PostgreSQLDao
+from sqlite_connector import SqliteDao
 import pandas as pd
 import os
 import unidecode
@@ -82,6 +83,7 @@ class ExcelConverterApp:
         """
         df['TVA'] = df['TVA'].apply(lambda x: 1 if pd.isna(x) else x)
         df['TVA'] = df['TVA'].apply(lambda x: 1 if isinstance(x, str) and 'TVA' in x else 0)
+        print(df['TVA'])
         return df
 
     def process_pu(self, df):
@@ -114,7 +116,7 @@ class ExcelConverterApp:
         Process the DataFrame by applying various transformations.
         """
         df = self.rename_columns(df)
-        df = self.process_tva(df)
+        # df = self.process_tva(df)
         df = self.process_pu(df)
         df = self.process_dp(df)
         df = self.process_libelle(df)
@@ -156,7 +158,7 @@ class ExcelConverterApp:
         except Exception as e:
             return None
 
-    def insert_into_db(self, filename, pg_connection):
+    def insert_into_db(self, filename, db_connection):
         current_directory = os.getcwd()
         emplacement = os.path.join(current_directory, filename)
         truncate_query = "TRUNCATE catalogue"
@@ -169,9 +171,9 @@ class ExcelConverterApp:
         update_query = '''
             CALL p_entree_fournisseur()
         '''
-        truncate_query_result = pg_connection.execute_query(truncate_query, fetch_results=False)
-        query_result = pg_connection.execute_query(query, fetch_results=False)
-        update_query_result = pg_connection.execute_query(update_query, fetch_results=False)
+        truncate_query_result = db_connection.execute_query(truncate_query, fetch_results=False)
+        query_result = db_connection.execute_query(query, fetch_results=False)
+        update_query_result = db_connection.execute_query(update_query, fetch_results=False)
         print(truncate_query_result)
         print(query_result)
         print(update_query_result)

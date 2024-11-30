@@ -6,10 +6,11 @@ import glob
 # Function to identify the header row and reset the dataframe with correct headers
 def identify_and_reset_header(df):
     # Check if there are any "Unnamed" columns
-    if any("Unnamed" in str(col) for col in df.columns):
-        # Iterate over rows to find the valid header row
+    print("-------------VIERGE--------------\n", df)
+    unnamed_count = sum(1 for col in df.columns if "Unnamed" in str(col))
+    if unnamed_count > 1:
         for idx, row in df.iterrows():
-            if row.notnull().sum() > 3:  # Assume a valid header has more than 2 non-null values
+            if row.notnull().sum() > 2:  # Assume a valid header has more than 2 non-null values
                 df.columns = df.iloc[idx]  # Reset the header to this row
                 df = df.drop(index=list(range(idx + 1)))  # Drop rows before the actual data
                 break
@@ -90,11 +91,14 @@ def process_excel_files(file_paths, fournisseurs):
     for file_path, fournisseur in zip(file_paths, fournisseurs):
         xls = pd.ExcelFile(file_path)
         relevant_sheets = filter_sheets_by_name(xls.sheet_names)
+        print(relevant_sheets)
         for sheet_name in relevant_sheets:
-
+            print("FOURNISSEUR = ", fournisseur)
             df = pd.read_excel(xls, sheet_name=sheet_name)
             df = identify_and_reset_header(df)
+            print("----------AVANT----------------\n", df)
             df = extract_and_unify_columns(df)
+            print("----------APRES----------------\n", df)
             df = clean_dataframe(df)
             if df.empty:
                 raise ValueError(f"Lors de la combinaison des excels, une erreur est survenue sur l'excel du fournisseur: {fournisseur}")

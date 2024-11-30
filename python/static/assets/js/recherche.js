@@ -32,6 +32,7 @@
                 contentType: false,
                 success: function(response) {
                     alert.empty();
+                    window.location.reload();
                     uploadSpinner.addClass('d-none');
                     alert.append(`<div class="alert alert-success alert-dismissible" role="alert">
                         FICHIER EXCEL IMPORTE AVEC SUCCES
@@ -39,9 +40,13 @@
                 },
                 error: function(xhr, status, error) {
                     uploadSpinner.addClass('d-none');
+                    alert.append(`<div class="alert alert-warning alert-dismissible" role="alert">
+                            Erreur lors de l'importation du fichier excel
+                        </div>`);
                     console.error('IMPORTATION ECHOUE: ', status, error);
                 },
             });
+            
         } else {
             alert.append(`<div class="alert alert-warning alert-dismissible" role="alert">
                 VEUILLEZ SELECTIONNER UN FICHIER A IMPORTER
@@ -109,7 +114,7 @@
                     <td>${row[0]}</td>
                     <td>${row[1]}</td>
                     <td>${currencyFormatter('fr-FR', 'MGA', row[2])}</td>
-                    <td>${formatTVA(row[3])}</td>
+                    <td>${row[3]}</td>
                     <td>${dateFormatter(row[4])}</td>
                 </tr>
             `);

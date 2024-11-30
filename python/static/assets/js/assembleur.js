@@ -92,52 +92,6 @@
 
         // console.log(formData);
         uploadSpinner.removeClass('d-none');
-        // Send AJAX request
-        // $.ajax({
-        //     url: `${API_BASE_URL}/upload-catalogue`,
-        //     type: 'POST',
-        //     data: formData,
-        //     processData: false,
-        //     contentType: false,
-        //     xhrFields: {
-        //         responseType: 'blob' // to handle file download
-        //     },
-            
-        //     success: function(blob, status, xhr) {
-        //         let filename = "";
-        //         let disposition = xhr.getResponseHeader('Content-Disposition');
-        //         if (disposition && disposition.indexOf('attachment') !== -1) {
-        //             let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        //             let matches = filenameRegex.exec(disposition);
-        //             if (matches != null && matches[1]) {
-        //                 filename = matches[1].replace(/['"]/g, '');
-        //             }
-        //         }
-
-        //         // If filename is not found in Content-Disposition, use X-Filename
-        //         if (!filename) {
-        //             const currentDate = new Date();
-        //             filename = xhr.getResponseHeader('X-Filename') || "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
-        //         }
-        //         uploadSpinner.addClass('d-none');
-        //         // Create a link and trigger download
-        //         let link = document.createElement('a');
-        //         link.href = window.URL.createObjectURL(blob);
-        //         link.download = filename;
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //         $("#alert").html('<div class="alert alert-success">Fichier assemblé avec succèss. Téléchargement en cours!</div>');
-        //     },
-        //     error: function(xhr, status, error) {
-        //         uploadSpinner.addClass('d-none');
-        //         // Handle error
-        //         console.log(status);
-        //         console.log(error);
-        //         console.log(xhr);
-        //         handleErrorResponse(xhr.responseText); // Pass the response text to handleErrorResponse
-        //     }
-        // });
         $.ajax({
             url: `${API_BASE_URL}/upload-catalogue`,
             type: 'POST',
@@ -148,26 +102,13 @@
                 responseType: 'blob' // to handle file download
             },
             success: function(blob, xhr) {
-                // Check if the response is a valid blob (indicating a file)
                 let filename = "";
-                let disposition = xhr.getResponseHeader('Content-Disposition');
-                if (disposition && disposition.indexOf('attachment') !== -1) {
-                    let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                    let matches = filenameRegex.exec(disposition);
-                    if (matches != null && matches[1]) {
-                        filename = matches[1].replace(/['"]/g, '');
-                    }
-                }
-    
                 // If filename is not found in Content-Disposition, use X-Filename
+                uploadSpinner.addClass('d-none');
                 if (!filename) {
                     const currentDate = new Date();
-                    filename = xhr.getResponseHeader('X-Filename') || "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
+                    filename = "CATALOGUE_" + dateFormatter(currentDate) + ".xlsx";
                 }
-                
-                console.log("erroR " + response.error);
-    
-                uploadSpinner.addClass('d-none');
                 let link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
                 link.download = filename;
@@ -187,5 +128,5 @@
         });
     });
     function handleErrorResponse(response) {
-            $("#alert").html('<div class="alert alert-danger">Erreurr: ' + response + '</div>');
+            $("#alert").html('<div class="alert alert-danger">Erreur: ' + response + '</div>');
     }   

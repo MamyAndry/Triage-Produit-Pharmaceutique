@@ -17,7 +17,15 @@ CREATE TABLE fournisseur(
     UNIQUE(nom)
 );
 
-ALTER TABLE catalogue ADD catalogue_search tsvector NULL;
+CREATE TABLE fournisseur_classement(
+    id SERIAL,
+    classement INTEGER,
+    id_fournisseur INTEGER,
+    FOREIGN KEY(id_fournisseur) REFERENCES fournisseur(id)
+);
 
+ALTER TABLE catalogue ADD catalogue_search tsvector NULL;
+ALTER TABLE catalogue ALTER COLUMN TVA TYPE VARCHAR(50) USING TVA::VARCHAR(50) CASCADE;
+ALTER TABLE fournisseur ADD CONSTRAINT primary_key_fournisseur PRIMARY KEY(id);
 
 SELECT * FROM catalogue WHERE catalogue_search @@ to_tsquery('french', 'paracetamol&500MG&SOPHARMAD&2025'); 

@@ -22,3 +22,15 @@ BEGIN
     ON CONFLICT (nom) DO NOTHING;
 END
 $$;
+
+
+CREATE OR REPLACE FUNCTION p_entree_fournisseur() 
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO fournisseur(nom)
+    SELECT DISTINCT fournisseur 
+    FROM catalogue
+    ON CONFLICT (nom) DO NOTHING;
+END
+$$;
