@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+    {% block content%}
+    
+    <div class="container mt-5">
+        <div class="row">
+                <!-- Table -->
+                <table class="table table-bordered" id="table-classement">
+                    <thead class="table-header">
+                        <tr>
+                            <th>FOURNISSEUR</th>
+                            <th class="left-item">CLASSEMENT</th>
+                        </tr>   
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- AJAX-populated table rows will appear here -->
+                            
+                    </tbody>
+                </table>
+        </div>
+    </div>
+    {% endblock%}
+    {% block script %}    
+        <script src="{{ url_for('static', filename='assets/js/classement.js') }}"></script>
+        <script>
+            $(document).ready(function() {
+                fetchPage();
+            });
+        </script>
+    {% endblock %}

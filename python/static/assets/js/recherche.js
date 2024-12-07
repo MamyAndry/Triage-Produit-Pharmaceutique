@@ -1,4 +1,3 @@
-
     let searchTermSaved  = "";
     const rowsPerPage = 20; // Number of rows per page
     let currentPage = 1; // Current page number    
@@ -113,9 +112,9 @@
                 <tr>
                     <td>${row[0]}</td>
                     <td>${row[1]}</td>
-                    <td>${currencyFormatter('fr-FR', 'MGA', row[2])}</td>
+                    <td class='left'>${currencyFormatter('fr-FR', 'MGA', row[2])}</td>
                     <td>${row[3]}</td>
-                    <td>${dateFormatter(row[4])}</td>
+                    <td class='center'>${dateFormatter(row[4])}</td>
                 </tr>
             `);
         });

@@ -4,9 +4,11 @@ from excel_treatment import ExcelConverterApp
 import os
 from psql_connector import PostgreSQLDao
 from io import BytesIO
-from excel_merger import *
+import pandas as pd
+from excel_merger import process_excel_files
 from datetime import datetime
-from utils import *
+from utils import delete_all_files_in_directory
+from services import fetch_data_from_database, search_into_database, fetch_all_furbisher, get_classement, update_ranking
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for the entire app
@@ -31,7 +33,11 @@ def index():
 
 @app.route('/assembleur')
 def assembleur():
-    return render_template('assembleur.html ')
+    return render_template('assembleur.html')
+
+@app.route('/classement')
+def classement():
+    return render_template('classeur.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -111,9 +117,17 @@ def upload_catalogue_file():
     
     delete_all_files_in_directory(app.config['UPLOAD_FOLDER'])    
     return response
+
     
 
-@app.route('/search', methods=['GET'])
+@app.route('/update-classement', methods=['GET'])
+def update_classement():
+    id_rank = int(request.args.get('id', 0))
+    classement = int(request.args.get('classement', 0))
+    update_ranking(pg_connection, id_rank, classement) 
+    return redirect('/classement')
+
+@app.route('/search', methods=['GET'])  
 def search():
     searched_words = str(request.args.get('libelle', ''))
     if searched_words != '':
@@ -125,17 +139,9 @@ def search():
     # Calculate the OFFSET for SQL query
     offset = (page - 1) * rows_per_page
     try:
-        # SQL query to fetch data with LIMIT and OFFSET
-        query = "SELECT fournisseur, libelle, PU, TVA, date_peremption FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s' LIMIT %d OFFSET %d"
-        query = query % ("%" +  libelle.replace(' ', '%%') + "%",  rows_per_page, offset)
-        print(query)
-        
-        data = pg_connection.execute_query(query, fetch_results=True)
-
-        # SQL query to get the total number of records
-        count_query = "SELECT COUNT(*) FROM v_best_quality_price_ratio_product WHERE libelle LIKE '%s'" % ("%" + libelle.replace(' ', '%%') + "%")
-        total_records = pg_connection.execute_query(count_query, fetch_one=True, fetch_results=False)[0]
-        total_pages = (total_records + rows_per_page - 1) // rows_per_page
+        datas_fetched = search_into_database(pg_connection, libelle, rows_per_page, offset)
+        data = datas_fetched['data']
+        total_pages = datas_fetched['total_pages']
         
         # Return the paginated data as a JSON response
         return jsonify({
@@ -144,15 +150,30 @@ def search():
         })
 
     except Exception as e:
+        print("Error searching data:", e)
         return jsonify({'error': error_fetching_data}), 500
+
+
+
+@app.route('/classement-furbisher', methods=['GET'])
+def classement_furbisher():
+    try:
+        # SQL query to fetch data with LIMIT and OFFSET
+        data = get_classement(pg_connection)
+        # Return the paginated data as a JSON response
+        return jsonify({
+            'data': data
+        })
+    except Exception as e:
+        print("Error fetching data:", e)
+        return jsonify({'error': error_fetching_data}), 500
+
 
 @app.route('/furbisher', methods=['GET'])
 def furbisher():
     try:
         # SQL query to fetch data with LIMIT and OFFSET
-        query = "SELECT nom FROM fournisseur"        
-        data = pg_connection.execute_query(query, fetch_results=True)
-
+        data = fetch_all_furbisher(pg_connection)
         # Return the paginated data as a JSON response
         return jsonify({
             'data': data
@@ -171,17 +192,10 @@ def fetch_data():
     
     # Slice the data for the current page
     try: 
-        # SQL query to fetch data with LIMIT and OFFSET
-        query = "SELECT * FROM catalogue LIMIT %s OFFSET %s" % (rows_per_page, offset)
-        data = pg_connection.execute_query(query, fetch_results=True)
+        datas_fetched = fetch_data_from_database(pg_connection, rows_per_page, offset)
+        data = datas_fetched['data']
+        total_pages = datas_fetched['total_pages']
 
-        # SQL query to get the total number of records
-        count_query = "SELECT COUNT(libelle) FROM catalogue"
-        total_records = pg_connection.execute_query(count_query, fetch_one=True, fetch_results=False)[0]
-        print('total_records', total_records)
-
-        total_pages = (total_records + rows_per_page - 1) // rows_per_page
-        
         # Return the paginated data as a JSON response
         return jsonify({
             'data': data,

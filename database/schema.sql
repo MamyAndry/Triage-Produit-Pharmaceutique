@@ -19,7 +19,7 @@ CREATE TABLE fournisseur(
 
 CREATE TABLE fournisseur_classement(
     id SERIAL,
-    classement INTEGER,
+    classement INTEGER DEFAULT 1,
     id_fournisseur INTEGER,
     FOREIGN KEY(id_fournisseur) REFERENCES fournisseur(id)
 );
@@ -27,5 +27,6 @@ CREATE TABLE fournisseur_classement(
 ALTER TABLE catalogue ADD catalogue_search tsvector NULL;
 ALTER TABLE catalogue ALTER COLUMN TVA TYPE VARCHAR(50) USING TVA::VARCHAR(50) CASCADE;
 ALTER TABLE fournisseur ADD CONSTRAINT primary_key_fournisseur PRIMARY KEY(id);
+ALTER TABLE fournisseur_classement ADD CONSTRAINT primary_key_classement PRIMARY KEY(id);
 
 SELECT * FROM catalogue WHERE catalogue_search @@ to_tsquery('french', 'paracetamol&500MG&SOPHARMAD&2025'); 

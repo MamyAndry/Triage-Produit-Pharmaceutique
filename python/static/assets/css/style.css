@@ -71,5 +71,29 @@ td {
 }
 #navbar ul li a{
     text-decoration: none;
-    font-size: 20px;
+    /* font-size: 10px; */
+}
+.sidebar{
+    display: list-item;
+    background-color: green;
+    color: white;
+    height: 70%;
+}
+.sidebar ul li{
+    text-decoration: none;
+    margin-bottom: 3%;
+}
+.sidebar ul li a{
+    text-decoration: none;
+    /* font-size: 10px; */
+}
+
+.left-item{
+    justify-content: left;      
+}
+.right-item{
+    justify-content: right;
+}
+.center-item{
+    justify-content: center;
 }
