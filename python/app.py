@@ -17,8 +17,8 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls'}
 
 
-pg_connection = PostgreSQLDao()
-pg_connection.connect()
+connection = PostgreSQLDao()
+connection.connect()
 
 error_fetching_data = 'Une erreur est survenue lors de la collecte des données.'
 
@@ -50,7 +50,7 @@ def upload_file():
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
         file_processor = ExcelConverterApp()
-        csv_file = file_processor.upload_and_convert(filename, pg_connection)
+        csv_file = file_processor.upload_and_convert(filename, connection)
         if csv_file:
             return f'Fichier convertit avec success: {csv_file}'
         return 'Conversion du fichier échoué'
@@ -124,7 +124,7 @@ def upload_catalogue_file():
 def update_classement():
     id_rank = int(request.args.get('id', 0))
     classement = int(request.args.get('classement', 0))
-    update_ranking(pg_connection, id_rank, classement) 
+    update_ranking(connection, id_rank, classement) 
     return redirect('/classement')
 
 @app.route('/search', methods=['GET'])  
@@ -139,7 +139,7 @@ def search():
     # Calculate the OFFSET for SQL query
     offset = (page - 1) * rows_per_page
     try:
-        datas_fetched = search_into_database(pg_connection, libelle, rows_per_page, offset)
+        datas_fetched = search_into_database(connection, libelle, rows_per_page, offset)
         data = datas_fetched['data']
         total_pages = datas_fetched['total_pages']
         
@@ -159,7 +159,7 @@ def search():
 def classement_furbisher():
     try:
         # SQL query to fetch data with LIMIT and OFFSET
-        data = get_classement(pg_connection)
+        data = get_classement(connection)
         # Return the paginated data as a JSON response
         return jsonify({
             'data': data
@@ -173,7 +173,7 @@ def classement_furbisher():
 def furbisher():
     try:
         # SQL query to fetch data with LIMIT and OFFSET
-        data = fetch_all_furbisher(pg_connection)
+        data = fetch_all_furbisher(connection)
         # Return the paginated data as a JSON response
         return jsonify({
             'data': data
@@ -192,7 +192,7 @@ def fetch_data():
     
     # Slice the data for the current page
     try: 
-        datas_fetched = fetch_data_from_database(pg_connection, rows_per_page, offset)
+        datas_fetched = fetch_data_from_database(connection, rows_per_page, offset)
         data = datas_fetched['data']
         total_pages = datas_fetched['total_pages']
 

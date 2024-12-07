@@ -38,7 +38,3 @@ function updateTableClassement(data) {
             `);
   });
 }
-
-function updateClassementButton(){
-
-}
